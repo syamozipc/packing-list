@@ -8,7 +8,3 @@ HTML 1ファイルだけの静的サイト。チェック状態は端末の loca
 ```sh
 open index.html
 ```
-
-## カスタマイズ
-
-`index.html` 内のデータレイヤー（BASE / WORKATION / CAMP 等）を編集すれば項目を変えられる。

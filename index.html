@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="ja" data-theme="auto">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1115" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4f6f9" />
+    <title>持ち物チェックリスト</title>
+    <script>
+      // フラッシュ防止：保存済みテーマを描画前に適用
+      try {
+        var __t = localStorage.getItem("packing-theme");
+        if (__t) document.documentElement.setAttribute("data-theme", __t);
+      } catch (e) {}
+    </script>
+    <style>
+      /* ダーク（既定の土台） */
+      :root {
+        --bg: #0f1115;
+        --panel: #181b22;
+        --panel-hi: #1f232c;
+        --border: #2a2f3a;
+        --text: #e6e8ec;
+        --muted: #8b93a3;
+        --accent: #4cc4a0;
+        --accent-dim: #2f7c66;
+        --danger: #e0685f;
+        --check: #0f1115;
+        --radius: 14px;
+      }
+      /* ライト配色（再利用用） */
+      :root[data-theme="light"],
+      :root[data-theme="auto"] {
+        --radius: 14px;
+      }
+      @media (prefers-color-scheme: light) {
+        :root[data-theme="auto"] {
+          --bg: #f4f6f9;
+          --panel: #ffffff;
+          --panel-hi: #eceff4;
+          --border: #e1e5ec;
+          --text: #1a1d23;
+          --muted: #6b7280;
+          --accent: #1f9e7a;
+          --accent-dim: #57c7a6;
+          --danger: #d9534f;
+          --check: #ffffff;
+        }
+      }
+      :root[data-theme="light"] {
+        --bg: #f4f6f9;
+        --panel: #ffffff;
+        --panel-hi: #eceff4;
+        --border: #e1e5ec;
+        --text: #1a1d23;
+        --muted: #6b7280;
+        --accent: #1f9e7a;
+        --accent-dim: #57c7a6;
+        --danger: #d9534f;
+        --check: #ffffff;
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP",
+          sans-serif;
+        line-height: 1.6;
+        padding: env(safe-area-inset-top) 0 4rem;
+      }
+      .wrap {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 1.25rem 1rem;
+      }
+
+      header {
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+      }
+      h1 {
+        font-size: 1.35rem;
+        margin: 0 0 0.25rem;
+        letter-spacing: 0.02em;
+      }
+      .theme-btn {
+        flex: 0 0 auto;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 10px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+        line-height: 1;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .theme-btn:hover {
+        background: var(--panel-hi);
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 0.82rem;
+        margin: 0;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* ===== カテゴリ選択画面 ===== */
+      .picker {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.85rem;
+        margin-top: 1.5rem;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.4rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .card:hover {
+        background: var(--panel-hi);
+        border-color: var(--accent-dim);
+        transform: translateY(-2px);
+      }
+      .card:active {
+        transform: translateY(0);
+      }
+      .card-emoji {
+        font-size: 2.2rem;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+      .card-name {
+        font-size: 1.05rem;
+        font-weight: 600;
+      }
+      .card-meta {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 0.4rem;
+        font-variant-numeric: tabular-nums;
+      }
+      .card-meta.partial {
+        color: var(--accent);
+      }
+
+      /* ===== チェック画面 ===== */
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .back {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 0.5rem 0.85rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .back:hover {
+        background: var(--panel-hi);
+      }
+      .nav-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+      .region-toggle {
+        margin-left: auto;
+        display: flex;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 2px;
+        gap: 2px;
+      }
+      .region-toggle .seg {
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 0.85rem;
+        padding: 0.35rem 0.7rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .region-toggle .seg.on {
+        background: var(--accent-dim);
+        color: #fff;
+        font-weight: 600;
+      }
+
+      .progress-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 0.9rem 1.1rem;
+        margin: 0 0 1.25rem;
+        position: sticky;
+        top: 0.5rem;
+        z-index: 5;
+      }
+      .progress-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.55rem;
+      }
+      .progress-label {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+      .progress-count {
+        font-size: 1.05rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      .progress-count b {
+        color: var(--accent);
+      }
+      .bar {
+        height: 8px;
+        background: var(--panel-hi);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .bar > span {
+        display: block;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--accent-dim), var(--accent));
+        border-radius: 99px;
+        transition: width 0.35s ease;
+      }
+      .done-badge {
+        color: var(--accent);
+        font-size: 0.82rem;
+        margin-left: 0.4rem;
+      }
+
+      .section-head {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+        margin: 1.4rem 0.2rem 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .section-head .tag {
+        font-size: 0.68rem;
+        font-weight: 500;
+        color: var(--accent);
+        background: rgba(76, 196, 160, 0.12);
+        border: 1px solid var(--accent-dim);
+        border-radius: 99px;
+        padding: 0.05rem 0.5rem;
+      }
+      .section-head .seccount {
+        margin-left: auto;
+        color: var(--muted);
+        font-weight: 400;
+        font-variant-numeric: tabular-nums;
+      }
+
+      ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      li {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.7rem 0.9rem;
+        border-top: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+      li:first-child {
+        border-top: none;
+      }
+      li.checked .name {
+        color: var(--muted);
+        text-decoration: line-through;
+      }
+      li:active {
+        background: var(--panel-hi);
+      }
+      .box {
+        width: 22px;
+        height: 22px;
+        flex: 0 0 22px;
+        border-radius: 6px;
+        border: 2px solid var(--border);
+        display: grid;
+        place-items: center;
+        transition: all 0.15s ease;
+      }
+      li.checked .box {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+      .box svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--check);
+        stroke-width: 3;
+        fill: none;
+        opacity: 0;
+        transition: opacity 0.15s;
+      }
+      li.checked .box svg {
+        opacity: 1;
+      }
+      .name {
+        flex: 1;
+      }
+      .item-emoji {
+        margin-right: 0.4em;
+        font-style: normal;
+      }
+
+      .clear-btn {
+        width: 100%;
+        margin-top: 1.75rem;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .clear-btn:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>🧳 持ち物チェックリスト</h1>
+          <p class="sub" id="subtitle">シチュエーションを選んでください</p>
+        </div>
+        <button class="theme-btn" id="themeBtn" title="テーマ切替（自動/ライト/ダーク）">
+          🌓
+        </button>
+      </header>
+
+      <!-- カテゴリ選択画面 -->
+      <div id="pickerView">
+        <div class="picker" id="picker"></div>
+      </div>
+
+      <!-- チェック画面 -->
+      <div id="listView" class="hidden">
+        <div class="nav">
+          <button class="back" id="backBtn">← 戻る</button>
+          <span class="nav-title" id="navTitle"></span>
+          <div class="region-toggle" id="regionToggle"></div>
+        </div>
+        <div class="progress-card">
+          <div class="progress-top">
+            <span class="progress-label"
+              >準備状況<span class="done-badge hidden" id="doneBadge"
+                >✓ 完了</span
+              ></span
+            >
+            <span class="progress-count"
+              ><b id="done">0</b> / <span id="total">0</span></span
+            >
+          </div>
+          <div class="bar"><span id="barFill"></span></div>
+        </div>
+        <div id="list"></div>
+        <button class="clear-btn" id="clearBtn">
+          このリストをクリア（チェックを全解除）
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // ===================================================================
+      // データ：Notion「🧳 準備リスト」を転記。共通ベース＋差分のレイヤー構造。
+      // 各シチュエーション = 下のレイヤーを上から順に合成（重複項目は先勝ちで除去）。
+      // ===================================================================
+
+      // --- 共通ベース（国内旅行ベース） ---
+      const BASE = [
+        {
+          section: "衣類",
+          items: ["服", "下着", "靴下", "運動着", "パジャマ", "帽子", "水着", "圧縮袋"],
+        },
+        {
+          section: "防寒",
+          items: ["ヒートテック上下", "ネックウォーマー", "ウルトラライトダウン", "手袋"],
+        },
+        {
+          section: "洗面・衛生",
+          items: [
+            "電動歯ブラシ・充電機器",
+            "歯磨き粉",
+            "フロス",
+            "メガネ",
+            "コンタクトレンズ",
+            "手ピカジェル",
+            "除菌シート",
+            "ポケットティッシュ",
+            "マスク",
+            "マウスピース・ケース",
+          ],
+        },
+        {
+          section: "薬",
+          items: [
+            "解熱鎮痛剤（イブ／ロキソニン）",
+            "アレグラ",
+            "ストッパ（下痢止め）",
+            "酔い止め",
+            "ムヒ",
+            "日焼け止め",
+            "目薬",
+            "絆創膏",
+            "ミント系のアメ・ガム・スプレー",
+          ],
+        },
+        {
+          section: "電子機器",
+          items: [
+            "スマホ",
+            "PC",
+            "Kindle",
+            "イヤフォン",
+            "Type-Cコード",
+            "ACアダプタ",
+            "モバイルバッテリー",
+          ],
+        },
+        {
+          section: "日用品",
+          items: [
+            "肩掛けバッグ",
+            "ボールペン",
+            "サングラス",
+            "ジップロック",
+            "ビニール袋",
+            "瓶開け",
+          ],
+        },
+        {
+          section: "マリンアクティビティ",
+          items: ["ゴーグル", "スマホ防水ケース", "ダイビングライセンスカード", "マリンシューズ・サンダル"],
+        },
+      ];
+
+      // --- 国内向けの差分（国内貴重品・洗面） ---
+      const DOMESTIC = [
+        { section: "洗面・衛生", items: ["シャンプー", "トリートメント"] },
+        {
+          section: "貴重品",
+          items: [
+            "財布",
+            "現金",
+            "クレジットカード",
+            "キャッシュカード",
+            "マイナンバーカード",
+          ],
+        },
+      ];
+
+      // --- バックパッカー以外が持つ追加（コートはBPだと嵩張るので除外） ---
+      const NON_BP = [{ section: "防寒", items: ["コート"] }];
+
+      // --- 海外編（共通に追加） ---
+      const ABROAD = [
+        {
+          section: "出発前チェック（海外）",
+          items: [
+            "航空券の予約確認",
+            "宿泊の予約確認",
+            "パスポート残存確認（6ヶ月以上）",
+            "査証／ビザ取得",
+            "海外旅行保険",
+            "現地インターネット利用（海外ローミング／Airalo）",
+            "国外運転免許証",
+            "ワクチン接種",
+            "狂犬病ワクチンが打てる病院を確認",
+            "プライオリティパス（アプリ）",
+          ],
+        },
+        {
+          section: "海外で持っていくもの",
+          items: [
+            "パスポート",
+            "パスポートのコピー",
+            "イエローカード（予防接種証明）",
+            "変換プラグ",
+            "アイマスク",
+            "耳栓",
+          ],
+        },
+        { section: "洗面・衛生", items: ["シャンプー", "トリートメント"] },
+        { section: "電子機器", items: ["スマホ・チェーン"] },
+        {
+          section: "貴重品",
+          items: ["財布・チェーン", "現地通貨（ドルでも可）", "クレジットカード", "運転免許証"],
+        },
+      ];
+
+      // --- ワーケーション追加（連泊・仕事ありの滞在） ---
+      const WORKATION = [
+        {
+          section: "洗面・衛生",
+          items: ["タオル"],
+        },
+        {
+          section: "仕事・PC環境",
+          items: [
+            "社用パソコン",
+            "モバイルモニター",
+            "モニターアーム",
+            "PCとモニターを繋ぐケーブル",
+            "六角レンチ（アーム取り付け用）",
+            "WiFiルーター",
+            "有線LANケーブル",
+          ],
+        },
+        {
+          section: "トレーニング・食事",
+          items: ["運動靴", "プロテイン", "プロテインシェイカー", "EAA", "体組成計"],
+        },
+        {
+          section: "日用品",
+          items: ["ハンガー", "計量カップ", "キッチンスケール（計量器）", "ハサミ", "キッチンペーパー（ロール）", "ペーパータオル", "サランラップ"],
+        },
+      ];
+
+      // --- 長期滞在（ワーケーション＋バックパッカー共通） ---
+      const LONGSTAY = [
+        { section: "洗面・衛生", items: ["髭剃り", "鼻毛剃り"] },
+        { section: "電子機器", items: ["延長コード"] },
+        { section: "日用品", items: ["爪切り"] },
+      ];
+
+      // --- バックパッカー追加（粗野・長期の海外旅） ---
+      const BACKPACKER = [
+        { section: "鞄", items: ["バックパック"] },
+        {
+          section: "洗面・洗濯",
+          items: [
+            "セームタオル",
+            "紙の石鹸",
+            "シャンプーケース（100ml未満）",
+            "トイレットペーパー",
+            "バケツ",
+            "紙の洗濯洗剤",
+            "洗濯紐",
+            "携帯ウォシュレット",
+            "雨具（ポンチョ）",
+          ],
+        },
+        { section: "薬", items: ["DEET（強力な虫除け）"] },
+        {
+          section: "防犯・道具",
+          items: [
+            "ワイヤーロック",
+            "南京錠",
+            "セキュリティポーチ",
+            "S字フック",
+            "重量計測器",
+          ],
+        },
+        { section: "日用品", items: ["水筒"] },
+      ];
+
+      // --- キャンプ共通装備（ロッジ・テント両方） ---
+      const CAMP = [
+        { section: "洗面・衛生", items: ["シャンプー"] },
+        {
+          section: "焚き火",
+          items: ["着火剤", "炭", "薪", "チャッカマン", "火吹き棒", "三角タワー", "軍手", "ファイヤーピット"],
+        },
+        {
+          section: "調理",
+          items: [
+            "ガスコンロ",
+            "ガスボンベ",
+            "バーベキュー台",
+            "BBQ用の網",
+            "BBQ用の串",
+            "トング（炭用）",
+            "メスティン",
+            "メスティン用タオル",
+            "ホットサンドプレート",
+            "スキレット",
+            "まな板",
+            "包丁",
+            "ラップ",
+            "アルミホイル",
+          ],
+        },
+        {
+          section: "食器・洗い物",
+          items: ["紙皿", "紙コップ", "箸", "スプーン", "フォーク", "ザル", "スポンジ", "食器用洗剤"],
+        },
+        { section: "食材・調味料", items: ["米", "焼肉のタレ", "油", "塩コショウ"] },
+        { section: "冷却・運搬", items: ["クーラーボックス", "保冷剤", "キャリーワゴン"] },
+        { section: "照明・家具", items: ["ランタン", "椅子", "テーブル"] },
+        {
+          section: "キャンプその他",
+          items: ["扇風機", "蚊取り線香", "虫除け", "花火", "折りたたみバケツ", "ドライヤー", "タオル", "耳栓"],
+        },
+      ];
+
+      // --- テント泊のみ（ロッジでは不要な就寝装備） ---
+      const TENT = [
+        { section: "テント泊装備", items: ["テント", "寝袋", "テントマット", "タープ", "枕"] },
+      ];
+
+      // ===== 絵文字マッピング =====
+      const EMOJI = {
+        // 衣類
+        "服": "👕", "下着": "🩲", "靴下": "🧦", "運動着": "🏃", "パジャマ": "😴",
+        "帽子": "🧢", "水着": "🩱", "圧縮袋": "📦",
+        // 防寒
+        "ヒートテック上下": "🥶", "ネックウォーマー": "🧣", "ウルトラライトダウン": "🧥",
+        "手袋": "🧤", "コート": "🧥",
+        // 洗面・衛生
+        "電動歯ブラシ・充電機器": "🪥", "歯磨き粉": "🦷", "フロス": "🦷",
+        "メガネ": "👓", "コンタクトレンズ": "👁️", "手ピカジェル": "🧴",
+        "除菌シート": "🧻", "ポケットティッシュ": "🤧", "マスク": "😷",
+        "マウスピース・ケース": "😬", "シャンプー": "🧴", "トリートメント": "🧴",
+        "タオル": "🛁", "髭剃り": "🪒", "鼻毛剃り": "✂️",
+        "セームタオル": "🏊", "紙の石鹸": "🧼",
+        "シャンプー（100ml未満）": "🧴", "トリートメント（100ml未満）": "🧴",
+        // 薬
+        "解熱鎮痛剤（イブ／ロキソニン）": "💊", "アレグラ": "💊", "ストッパ（下痢止め）": "💊",
+        "酔い止め": "🤢", "ムヒ": "🩹", "日焼け止め": "☀️", "目薬": "💧",
+        "絆創膏": "🩹", "ミント系のアメ・ガム・スプレー": "🍬", "DEET（強力な虫除け）": "🦟",
+        // 電子機器
+        "スマホ": "📱", "PC": "💻", "Kindle": "📖", "イヤフォン": "🎧",
+        "Type-Cコード": "🔌", "ACアダプタ": "🔌", "モバイルバッテリー": "🔋",
+        "スマホ・チェーン": "📱", "延長コード": "🔌",
+        "社用パソコン": "💻", "モバイルモニター": "🖥️", "モニターアーム": "🦾",
+        "PCとモニターを繋ぐケーブル": "🖥️", "六角レンチ（アーム取り付け用）": "🔧",
+        "WiFiルーター": "📡", "有線LANケーブル": "🌐",
+        // 日用品
+        "肩掛けバッグ": "👜", "ボールペン": "🖊️", "サングラス": "🕶️",
+        "ジップロック": "🗂️", "ビニール袋": "🛍️", "瓶開け": "🍾",
+        "ハンガー": "🪝", "計量カップ": "🥛", "キッチンスケール（計量器）": "⚖️",
+        "ハサミ": "✂️", "キッチンペーパー（ロール）": "🧻", "ペーパータオル": "🧻",
+        "サランラップ": "♻️", "爪切り": "✂️", "水筒": "🚰",
+        // 水まわり・アクティビティ
+        "ゴーグル": "🥽", "スマホ防水ケース": "📱", "ダイビングライセンスカード": "🤿", "マリンシューズ・サンダル": "👟",
+        // 貴重品
+        "財布": "👛", "現金": "💴", "クレジットカード": "💳",
+        "キャッシュカード": "💳", "マイナンバーカード": "🪪",
+        "財布・チェーン": "👛", "現地通貨（ドルでも可）": "💵", "運転免許証": "🪪",
+        // 出発前チェック
+        "航空券の予約確認": "✈️", "宿泊の予約確認": "🏨",
+        "パスポート残存確認（6ヶ月以上）": "🛂", "査証／ビザ取得": "📋",
+        "海外旅行保険": "🏥", "現地インターネット利用（海外ローミング／Airalo）": "📶",
+        "国外運転免許証": "🚗", "ワクチン接種": "💉",
+        "狂犬病ワクチンが打てる病院を確認": "🐕", "プライオリティパス（アプリ）": "🛫",
+        // 海外持ち物
+        "パスポート": "🛂", "パスポートのコピー": "📄",
+        "イエローカード（予防接種証明）": "📋", "変換プラグ": "🔌",
+        "アイマスク": "😴", "耳栓": "👂",
+        // トレーニング・食事
+        "運動靴": "👟", "プロテイン": "💪", "プロテインシェイカー": "🥤",
+        "EAA": "💊", "体組成計": "⚖️",
+        // 鞄
+        "バックパック": "🎒",
+        // 洗面・洗濯
+        "シャンプーケース（100ml未満）": "🧴", "トイレットペーパー": "🧻",
+        "バケツ": "🪣", "紙の洗濯洗剤": "🫧", "洗濯紐": "🪢",
+        "携帯ウォシュレット": "🚿", "雨具（ポンチョ）": "🌧️",
+        // 防犯・道具
+        "ワイヤーロック": "🔒", "南京錠": "🔒", "セキュリティポーチ": "👝",
+        "S字フック": "🪝", "重量計測器": "⚖️",
+        // 焚き火
+        "着火剤": "🔥", "炭": "🪵", "薪": "🪵", "チャッカマン": "🔥",
+        "火吹き棒": "💨", "三角タワー": "🔺", "軍手": "🧤", "ファイヤーピット": "🔥",
+        // 調理
+        "ガスコンロ": "🍳", "ガスボンベ": "🫙", "バーベキュー台": "🍖",
+        "BBQ用の網": "🥩", "BBQ用の串": "🍢", "トング（炭用）": "🥢",
+        "メスティン": "🍲", "メスティン用タオル": "🧻", "ホットサンドプレート": "🥪",
+        "スキレット": "🍳", "まな板": "🔪", "包丁": "🔪", "ラップ": "♻️",
+        "アルミホイル": "🫙",
+        // 食器
+        "紙皿": "🍽️", "紙コップ": "☕", "箸": "🥢", "スプーン": "🥄",
+        "フォーク": "🍴", "ザル": "🫙", "スポンジ": "🧽", "食器用洗剤": "🫧",
+        // 食材・調味料
+        "米": "🍚", "焼肉のタレ": "🥩", "油": "🫙", "塩コショウ": "🧂",
+        // 冷却・運搬
+        "クーラーボックス": "🧊", "保冷剤": "🧊", "キャリーワゴン": "🛒",
+        // 照明・家具
+        "ランタン": "🏮", "椅子": "🪑", "テーブル": "🪑",
+        // キャンプその他
+        "扇風機": "🌀", "蚊取り線香": "🦟", "虫除け": "🦟", "花火": "🎆",
+        "折りたたみバケツ": "🪣", "ドライヤー": "💨",
+        // テント泊
+        "テント": "⛺", "寝袋": "🛌", "テントマット": "🛏️", "タープ": "☂️", "枕": "😴",
+      };
+
+      // ===== 旅のタイプ定義 =====
+      // fixed: 常に含むレイヤー / toggle: 2択（a=既定）。各選択肢がレイヤーを足す（null可）
+      // toggle無し＝固定。toggleのレイヤーは末尾に付く。
+      const REGION = {
+        a: { label: "国内", layer: DOMESTIC },
+        b: { label: "海外", layer: ABROAD },
+      };
+      const TRIPS = [
+        { key: "travel", name: "旅行", emoji: "✈️", fixed: [BASE, NON_BP], toggle: REGION },
+        { key: "workation", name: "ワーケーション", emoji: "💻", fixed: [BASE, NON_BP, WORKATION, LONGSTAY], toggle: REGION },
+        { key: "camping", name: "キャンプ", emoji: "⛺", fixed: [BASE, NON_BP, CAMP, DOMESTIC], toggle: { a: { label: "ロッジ", layer: null }, b: { label: "テント", layer: TENT } } },
+        { key: "backpacker", name: "バックパッカー", emoji: "🎒", fixed: [BASE, BACKPACKER, LONGSTAY, ABROAD], toggle: null },
+      ];
+
+      // トグルでbが選ばれているか（既定はa）
+      function toggleOn(trip) {
+        return !!(state.variant && state.variant[trip.key]);
+      }
+
+      // レイヤー構成を組み立てる（トグルの選択レイヤーは末尾）
+      function layersFor(trip) {
+        const layers = [...trip.fixed];
+        if (trip.toggle) {
+          const sel = toggleOn(trip) ? trip.toggle.b : trip.toggle.a;
+          if (sel.layer) layers.push(sel.layer);
+        }
+        return layers;
+      }
+
+      // レイヤーを合成 → セクション配列を返す（重複アイテムは先勝ちで除去・空セクション除外）
+      function compose(trip) {
+        const seen = new Set();
+        const result = [];
+        const byName = new Map(); // 同名セクションは1つに統合
+        layersFor(trip).forEach((layer) => {
+          layer.forEach((sec) => {
+            const fresh = [];
+            sec.items.forEach((name) => {
+              if (seen.has(name)) return;
+              seen.add(name);
+              fresh.push(name);
+            });
+            if (!fresh.length) return;
+            if (byName.has(sec.section)) {
+              byName.get(sec.section).items.push(...fresh);
+            } else {
+              const entry = { section: sec.section, items: fresh };
+              byName.set(sec.section, entry);
+              result.push(entry);
+            }
+          });
+        });
+        return result;
+      }
+
+      function flatItems(situation) {
+        return compose(situation).flatMap((s) => s.items);
+      }
+
+      // ===== 状態：項目名ベースで保存（タイプごと独立） =====
+      const STORAGE_KEY = "packing-list-v5";
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const s = JSON.parse(raw);
+            if (!s.variant) s.variant = {}; // トグル選択（タイプ別 / true=b側）
+            return s;
+          }
+        } catch (e) {}
+        // checks[key] = { itemName: true } / variant[key] = true(b側)
+        return { selected: null, variant: {}, checks: {} };
+      }
+      let state = loadState();
+      function save() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+      function checksFor(key) {
+        return state.checks[key] || (state.checks[key] = {});
+      }
+
+      const pickerView = document.getElementById("pickerView");
+      const listView = document.getElementById("listView");
+      const subtitle = document.getElementById("subtitle");
+
+      function renderPicker() {
+        const picker = document.getElementById("picker");
+        picker.innerHTML = "";
+        TRIPS.forEach((t) => {
+          const checks = checksFor(t.key);
+          // 項目数はトグル次第で変わるので出さない。進行中だけ示す
+          const partial = Object.keys(checks).length > 0;
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+          <span class="card-emoji">${t.emoji}</span>
+          <div class="card-name">${t.name}</div>
+          <div class="card-meta ${partial ? "partial" : ""}">${partial ? "● チェック中" : ""}</div>`;
+          card.onclick = () => selectSituation(t.key);
+          picker.appendChild(card);
+        });
+      }
+
+      function selectSituation(key) {
+        state.selected = key;
+        save();
+        showList();
+      }
+
+      function showPicker() {
+        state.selected = null;
+        save();
+        listView.classList.add("hidden");
+        pickerView.classList.remove("hidden");
+        subtitle.textContent = "シチュエーションを選んでください";
+        renderPicker();
+      }
+
+      function renderRegionToggle(trip) {
+        const wrap = document.getElementById("regionToggle");
+        if (!trip.toggle) {
+          // トグル無し（例：バックパッカー＝海外固定）→ 非表示
+          wrap.classList.add("hidden");
+          wrap.innerHTML = "";
+          return;
+        }
+        wrap.classList.remove("hidden");
+        const on = toggleOn(trip);
+        wrap.innerHTML = `
+          <button class="seg ${!on ? "on" : ""}" data-side="a">${escapeHtml(trip.toggle.a.label)}</button>
+          <button class="seg ${on ? "on" : ""}" data-side="b">${escapeHtml(trip.toggle.b.label)}</button>`;
+        wrap.querySelectorAll(".seg").forEach((btn) => {
+          btn.onclick = () => {
+            state.variant[trip.key] = btn.dataset.side === "b";
+            save();
+            showList(); // 再合成して再描画
+          };
+        });
+      }
+
+      function showList() {
+        const s = TRIPS.find((x) => x.key === state.selected);
+        if (!s) {
+          showPicker();
+          return;
+        }
+        const checks = checksFor(s.key);
+        const sections = compose(s);
+
+        pickerView.classList.add("hidden");
+        listView.classList.remove("hidden");
+        subtitle.textContent = "タップでチェック · 状態は自動保存";
+        document.getElementById("navTitle").innerHTML = `${s.emoji} ${s.name}`;
+        renderRegionToggle(s);
+
+        const container = document.getElementById("list");
+        container.innerHTML = "";
+        sections.forEach((sec) => {
+          const head = document.createElement("div");
+          head.className = "section-head";
+          head.innerHTML = `<span>${escapeHtml(sec.section)}</span><span class="seccount"></span>`;
+          container.appendChild(head);
+
+          const ul = document.createElement("ul");
+          sec.items.forEach((name) => {
+            const li = document.createElement("li");
+            if (checks[name]) li.className = "checked";
+            li.innerHTML = `
+            <div class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></div>
+            <span class="name">${EMOJI[name] ? `<span class="item-emoji">${EMOJI[name]}</span>` : ""}${escapeHtml(name)}</span>`;
+            li.onclick = () => {
+              if (checks[name]) delete checks[name];
+              else checks[name] = true;
+              save();
+              li.classList.toggle("checked");
+              updateProgress(s);
+              updateSecCount(head, sec, checks);
+            };
+            ul.appendChild(li);
+          });
+          container.appendChild(ul);
+          updateSecCount(head, sec, checks);
+        });
+        updateProgress(s);
+      }
+
+      function updateSecCount(head, sec, checks) {
+        const done = sec.items.filter((n) => checks[n]).length;
+        head.querySelector(".seccount").textContent =
+          `${done}/${sec.items.length}`;
+      }
+
+      function updateProgress(s) {
+        const items = flatItems(s);
+        const checks = checksFor(s.key);
+        const done = items.filter((n) => checks[n]).length;
+        const total = items.length;
+        document.getElementById("done").textContent = done;
+        document.getElementById("total").textContent = total;
+        document.getElementById("barFill").style.width = total
+          ? (done / total) * 100 + "%"
+          : "0%";
+        document
+          .getElementById("doneBadge")
+          .classList.toggle("hidden", done !== total || total === 0);
+      }
+
+      function escapeHtml(s) {
+        return s.replace(
+          /[&<>"']/g,
+          (m) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[m],
+        );
+      }
+
+      // ===== テーマ切替（自動 → ライト → ダーク を循環） =====
+      const THEME_KEY = "packing-theme";
+      const THEMES = ["auto", "light", "dark"];
+      const THEME_ICON = { auto: "🌓", light: "☀️", dark: "🌙" };
+      const themeBtn = document.getElementById("themeBtn");
+      function loadTheme() {
+        try {
+          return localStorage.getItem(THEME_KEY) || "auto";
+        } catch (e) {
+          return "auto";
+        }
+      }
+      function applyTheme(t) {
+        document.documentElement.setAttribute("data-theme", t);
+        themeBtn.textContent = THEME_ICON[t];
+        themeBtn.title =
+          "テーマ：" +
+          { auto: "自動（OS追従）", light: "ライト", dark: "ダーク" }[t] +
+          " — タップで切替";
+      }
+      let theme = loadTheme();
+      applyTheme(theme);
+      themeBtn.onclick = () => {
+        theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+        try {
+          localStorage.setItem(THEME_KEY, theme);
+        } catch (e) {}
+        applyTheme(theme);
+      };
+
+      document.getElementById("backBtn").onclick = showPicker; // チェックは保持して戻る
+      document.getElementById("clearBtn").onclick = () => {
+        const s = TRIPS.find((x) => x.key === state.selected);
+        if (!s) return;
+        if (!confirm(`「${s.name}」のチェックを全て外しますか？`)) return;
+        state.checks[s.key] = {};
+        save();
+        showPicker(); // クリア後はカテゴリ選択へ戻る
+      };
+
+      // ===== 起動時：最後に開いていたカテゴリを復元 =====
+      renderPicker();
+      if (state.selected && TRIPS.find((x) => x.key === state.selected))
+        showList();
+      else showPicker();
+    </script>
+  </body>
+</html>

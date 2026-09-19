@@ -515,6 +515,14 @@
       // --- バックパッカー以外が持つ追加（コートはBPだと嵩張るので除外） ---
       const NON_BP = [{ section: "防寒", items: ["コート"] }];
 
+      // --- スーツケース利用時（旅行・ワーケーション。キャンプ／BPは対象外） ---
+      const SUITCASE = [{ section: "鞄", items: ["スーツケースカバー"] }];
+
+      // --- 筋トレ継続用（旅行にも携行。ワーケーションはWORKATION側に同項目あり） ---
+      const PROTEIN = [
+        { section: "トレーニング・食事", items: ["プロテイン", "プロテインシェイカー"] },
+      ];
+
       // --- 海外編（共通に追加） ---
       const ABROAD = [
         {
@@ -714,7 +722,7 @@
         "運動靴": "👟", "プロテイン": "💪", "プロテインシェイカー": "🥤",
         "EAA": "💊", "体組成計": "⚖️",
         // 鞄
-        "バックパック": "🎒",
+        "バックパック": "🎒", "スーツケースカバー": "🧳",
         // 洗面・洗濯
         "シャンプーケース（100ml未満）": "🧴", "トイレットペーパー": "🧻",
         "バケツ": "🪣", "紙の洗濯洗剤": "🫧", "洗濯紐": "🪢",
@@ -755,8 +763,8 @@
         b: { label: "海外", layer: ABROAD },
       };
       const TRIPS = [
-        { key: "travel", name: "旅行", emoji: "✈️", fixed: [BASE, NON_BP], toggle: REGION },
-        { key: "workation", name: "ワーケーション", emoji: "💻", fixed: [BASE, NON_BP, WORKATION, LONGSTAY], toggle: REGION },
+        { key: "travel", name: "旅行", emoji: "✈️", fixed: [BASE, NON_BP, SUITCASE, PROTEIN], toggle: REGION },
+        { key: "workation", name: "ワーケーション", emoji: "💻", fixed: [BASE, NON_BP, SUITCASE, WORKATION, LONGSTAY], toggle: REGION },
         { key: "camping", name: "キャンプ", emoji: "⛺", fixed: [BASE, NON_BP, CAMP, DOMESTIC], toggle: { a: { label: "ロッジ", layer: null }, b: { label: "テント", layer: TENT } } },
         { key: "backpacker", name: "バックパッカー", emoji: "🎒", fixed: [BASE, BACKPACKER, LONGSTAY, ABROAD], toggle: null },
       ];
